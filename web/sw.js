@@ -1,5 +1,5 @@
 // Увеличете номера на версията при всяка промяна на файловете, за да се обнови кешът.
-const C = 'kabel-v3';
+const C = 'kabel-v4';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 self.addEventListener('install', e => e.waitUntil(caches.open(C).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(

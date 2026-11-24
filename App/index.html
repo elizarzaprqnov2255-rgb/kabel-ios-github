@@ -55,6 +55,8 @@ td:last-child{text-align:right;font-weight:600}
 .chk{margin:12px 0 0;padding:0;list-style:none}
 .chk li{padding:3px 0}
 #sum h2{font-size:17px;margin:18px 0 6px;color:var(--y)}
+.addrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.b.clr{min-height:40px;padding:6px 16px;font-size:15px}
 .pdf{width:100%;margin-top:18px}
 .pdf:disabled{opacity:.6;cursor:wait}
 .pdfres{margin-top:10px;font-size:14px;color:var(--m)}
@@ -79,7 +81,7 @@ td:last-child{text-align:right;font-weight:600}
  <label>Изготвил<input data-p="by" type="text"></label>
 </div>
 <div id="list"></div>
-<button type="button" class="b sm" id="add" aria-label="Добави консуматор" title="Добави консуматор">+</button>
+<div class="addrow"><button type="button" class="b sm" id="add" aria-label="Добави консуматор" title="Добави консуматор">+</button><button type="button" class="b clr" id="clr">Изчисти</button></div>
 <div id="sum"></div>
 <button type="button" class="b pdf" id="pdf" hidden>Изтегли PDF</button>
 <div id="pdfres" class="pdfres" hidden></div>
@@ -145,10 +147,10 @@ function card(s){
  <label>Име на консуматора<input data-k="name" type="text" placeholder="напр. Бойлер"></label>
  <span class="lb sp">Фазност</span><div class="row ph"></div>
  <div class="grid sp">
-  <label>Мощност (kW)<input data-k="p" type="number" min="0" step="0.1" inputmode="decimal"></label>
-  <label>cos φ<input data-k="pf" type="number" min="0.1" max="1" step="0.01" inputmode="decimal"></label>
-  <label>Дължина (m)<input data-k="l" type="number" min="1" step="1" inputmode="decimal"></label>
-  <label>Допустим пад (%)<input data-k="du" type="number" min="0.5" step="0.5" inputmode="decimal"></label>
+  <label>Мощност (kW)<input data-k="p" type="number" min="0" step="0.1" inputmode="decimal" placeholder="напр. 7"></label>
+  <label>cos φ<input data-k="pf" type="number" min="0.1" max="1" step="0.01" inputmode="decimal" placeholder="1"></label>
+  <label>Дължина (m)<input data-k="l" type="number" min="1" step="1" inputmode="decimal" placeholder="напр. 30"></label>
+  <label>Допустим пад (%)<input data-k="du" type="number" min="0.5" step="0.5" inputmode="decimal" placeholder="3"></label>
  </div>
  <span class="lb sp">Проводник</span><div class="row mat"></div>
  <span class="lb sp">Кабел – най-често ползвани</span><div class="row main"></div>
@@ -459,7 +461,7 @@ document.querySelectorAll('[data-p]').forEach(i=>i.addEventListener('input',()=>
  function apply(items){
   const cs=items.slice(0,20).map(norm).filter(Boolean);
   if(!cs.length)return null;
-  const d0=lines[0],pristine=lines.length===1&&d0.name===''&&d0.p==='7'&&d0.l==='30'&&d0.pf==='1'&&d0.du==='3'&&d0.tri===0&&d0.type==='svt'&&d0.auto===1;
+  const d0=lines[0],pristine=lines.length===1&&d0.name===''&&d0.tri===0&&d0.type==='svt'&&d0.auto===1&&d0.ch==='C'&&((d0.p==='7'&&d0.l==='30'&&d0.pf==='1'&&d0.du==='3')||(d0.p===''&&d0.l===''&&d0.pf===''&&d0.du===''));
   lines=pristine?cs:lines.concat(cs);
   renderAll();
   return cs;
@@ -488,6 +490,17 @@ document.querySelectorAll('[data-p]').forEach(i=>i.addEventListener('input',()=>
   go.disabled=false;
  };
 })();
+let clrT=null;
+$('clr').onclick=()=>{
+ const b=$('clr');
+ if(!clrT){b.textContent='Сигурни ли сте? Натиснете пак';clrT=setTimeout(()=>{b.textContent='Изчисти';clrT=null;},3500);return;}
+ clearTimeout(clrT);clrT=null;b.textContent='Изчисти';
+ lines=[{...mk(),p:'',pf:'',l:'',du:''}];
+ proj.name=proj.obj=proj.by='';
+ document.querySelectorAll('[data-p]').forEach(i=>i.value='');
+ $('aitxt').value='';$('aist').textContent='';$('pdfres').hidden=true;
+ renderAll();window.scrollTo({top:0,behavior:'smooth'});
+};
 themeBtns();
 renderAll();
 </script>
