@@ -1,0 +1,28 @@
+name: Сглобяване на iOS приложение (.ipa)
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Инсталиране на XcodeGen
+        run: brew install xcodegen
+      - name: Генериране на Xcode проект
+        run: xcodegen generate
+      - name: Компилиране (без подпис)
+        run: |
+          xcodebuild -project Kabel.xcodeproj -scheme Kabel -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+      - name: Пакетиране в .ipa
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/Kabel.app Payload/
+          zip -r Kabel.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kabel-ipa
+          path: Kabel.ipa
